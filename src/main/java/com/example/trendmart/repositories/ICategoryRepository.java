@@ -8,4 +8,6 @@ import com.example.trendmart.entities.Category;
 
 public interface ICategoryRepository extends JpaRepository<Category, UUID> {
     Category findByName(String name);
+
+    boolean existsByName(String name);
 }
