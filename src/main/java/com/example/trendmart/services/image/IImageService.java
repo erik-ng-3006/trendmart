@@ -1,7 +1,6 @@
 package com.example.trendmart.services.image;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,11 +8,11 @@ import com.example.trendmart.dtos.ImageDTO;
 import com.example.trendmart.entities.Image;
 
 public interface IImageService {
-  Image getImageById(UUID id);
+  Image getImageById(Long id);
 
-  void deleteImageById(UUID id);
+  void deleteImageById(Long id);
   
-  List<ImageDTO> saveImage(List<MultipartFile> files, UUID productId);
+  List<ImageDTO> saveImage(List<MultipartFile> files, Long productId);
 
-  void updateImage(MultipartFile file, UUID id);
+  void updateImage(MultipartFile file, Long id);
 }

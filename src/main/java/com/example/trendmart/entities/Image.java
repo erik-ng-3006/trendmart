@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.sql.Blob;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -15,8 +14,8 @@ import java.util.UUID;
 @Entity
 public class Image {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     String fileName;
 

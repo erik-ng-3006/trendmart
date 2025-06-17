@@ -2,7 +2,6 @@ package com.example.trendmart.services.product;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -26,14 +25,18 @@ public class ProductService implements IProductService {
 
     @Override
     public Product addProduct(AddProductRequest request) {
-        // create category if it doesn't exist
+        // check if the category is found in the DB
+        // If Yes, set it as the new product category
+        // If No, the save it as a new category
+        // The set as the new product category.
+
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() -> {
                     Category newCategory = new Category(request.getCategory().getName());
                     return categoryRepository.save(newCategory);
                 });
         request.setCategory(category);
-        return productRepository.save(createProduct(request,category));
+        return productRepository.save(createProduct(request, category));
     }
 
     // helper method to create a product
@@ -47,12 +50,12 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product getProductById(UUID id) {
+    public Product getProductById(Long id) {
         return productRepository.findById(id).orElseThrow(() -> new ProductNotFoundException("Product not found"));
     }
 
     @Override
-    public void deleteProductById(UUID id) {
+    public void deleteProductById(Long id) {
         productRepository.findById(id)
                 .ifPresentOrElse(productRepository::delete,
                         () -> {
@@ -62,7 +65,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product updateProductById(ProductUpdateRequest request, UUID id) {
+    public Product updateProductById(ProductUpdateRequest request, Long id) {
         return productRepository.findById(id)
                 .map(existingProduct -> updateExistingProduct(existingProduct, request))
                 .map(productRepository::save)

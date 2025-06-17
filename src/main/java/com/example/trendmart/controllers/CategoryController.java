@@ -1,7 +1,5 @@
 package com.example.trendmart.controllers;
 
-import java.util.UUID;
-
 import static org.springframework.http.HttpStatus.CONFLICT;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -66,7 +64,7 @@ public class CategoryController {
       @ApiResponse(responseCode = "404", description = "Category not found")
   })
   @GetMapping("/{id}")
-  public ResponseEntity<CustomApiResponse> getCategoryById(@PathVariable UUID id) {
+  public ResponseEntity<CustomApiResponse> getCategoryById(@PathVariable Long id) {
     try {
       return ResponseEntity.ok(new CustomApiResponse("Category fetched successfully", categoryService.getCategoryById(id)));
     } catch (Exception e) {
@@ -94,7 +92,7 @@ public class CategoryController {
       @ApiResponse(responseCode = "404", description = "Category not found")
   })
   @DeleteMapping("/delete/{id}")
-  public ResponseEntity<CustomApiResponse> deleteCategoryById(@PathVariable UUID id) {
+  public ResponseEntity<CustomApiResponse> deleteCategoryById(@PathVariable Long id) {
     try {
       categoryService.deleteCategoryById(id);
       return ResponseEntity.ok(new CustomApiResponse("Category deleted successfully", null));
@@ -109,7 +107,7 @@ public class CategoryController {
       @ApiResponse(responseCode = "404", description = "Category not found")
   })
   @PostMapping("/update/{id}")
-  public ResponseEntity<CustomApiResponse> updateCategory(@PathVariable UUID id, @RequestBody Category category) {
+  public ResponseEntity<CustomApiResponse> updateCategory(@PathVariable Long id, @RequestBody Category category) {
     try {
       return ResponseEntity.ok(new CustomApiResponse("Category updated successfully", categoryService.updateCategory(category, id)));
     } catch (Exception e) {

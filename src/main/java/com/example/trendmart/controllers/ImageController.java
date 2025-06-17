@@ -2,7 +2,6 @@ package com.example.trendmart.controllers;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -47,7 +46,7 @@ public class ImageController {
     })
     @PostMapping("/upload")
     public ResponseEntity<CustomApiResponse> saveImages(@RequestParam("files") List<MultipartFile> files, 
-                                                        @RequestParam("productId") UUID productId) {
+                                                        @RequestParam("productId") Long productId) {
         try {
             List<ImageDTO> savedImageDTO = imageService.saveImage(files, productId);
             return ResponseEntity.ok(new CustomApiResponse("Images saved successfully", savedImageDTO));
@@ -63,7 +62,7 @@ public class ImageController {
         @ApiResponse(responseCode = "404", description = "Image not found")
     })
     @GetMapping("/image/download/{id}")
-    public ResponseEntity<Resource> downloadImage(@PathVariable UUID id) throws SQLException {
+    public ResponseEntity<Resource> downloadImage(@PathVariable Long id) throws SQLException {
         Image image = imageService.getImageById(id);
 
         ByteArrayResource resource = new ByteArrayResource(image.getImage().getBytes(1, (int) image.getImage().length()));
@@ -81,7 +80,7 @@ public class ImageController {
         @ApiResponse(responseCode = "500", description = "Failed to update image")
     })
     @PutMapping("/image/{id}/update")
-    public ResponseEntity<CustomApiResponse> updateImage(@PathVariable UUID id, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<CustomApiResponse> updateImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
             Image image = imageService.getImageById(id);
 
@@ -103,7 +102,7 @@ public class ImageController {
         @ApiResponse(responseCode = "500", description = "Failed to delete image")
     })
     @DeleteMapping("/image/{id}/delete")
-    public ResponseEntity<CustomApiResponse> deleteImage(@PathVariable UUID id) {
+    public ResponseEntity<CustomApiResponse> deleteImage(@PathVariable Long id) {
         try {
             Image image = imageService.getImageById(id);
 

@@ -1,8 +1,8 @@
 package com.example.trendmart.entities;
 
 import java.util.List;
-import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,11 +23,12 @@ import lombok.experimental.FieldDefaults;
 @Entity
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     
     String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "category")
     List<Product> products;
 

@@ -2,7 +2,6 @@ package com.example.trendmart.services.category;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,7 @@ public class CategoryService implements ICategoryService {
   private final ICategoryRepository categoryRepository;
 
   @Override
-  public Category getCategoryById(UUID id) {
+  public Category getCategoryById(Long id) {
     return categoryRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Category not found"));
   }
 
@@ -41,7 +40,7 @@ public class CategoryService implements ICategoryService {
   }
 
   @Override
-  public Category updateCategory(Category category, UUID id) { 
+  public Category updateCategory(Category category, Long id) { 
     return Optional.ofNullable(getCategoryById(id)).map(existingCategory -> {
       existingCategory.setName(category.getName());
       return categoryRepository.save(existingCategory);
@@ -49,7 +48,7 @@ public class CategoryService implements ICategoryService {
   }
 
   @Override
-  public void deleteCategoryById(UUID id) {
+  public void deleteCategoryById(Long id) {
     categoryRepository.findById(id).ifPresentOrElse(categoryRepository::delete, () -> {
       throw new ResourceNotFoundException("Category not found");
     });

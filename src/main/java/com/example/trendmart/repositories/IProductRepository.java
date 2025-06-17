@@ -1,13 +1,12 @@
 package com.example.trendmart.repositories;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.trendmart.entities.Product;
 
-public interface IProductRepository extends JpaRepository<Product, UUID> {
+public interface IProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryName(String categoryName);
 
     List<Product> findByBrand(String brand);

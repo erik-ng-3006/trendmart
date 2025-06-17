@@ -2,7 +2,6 @@ package com.example.trendmart.entities;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -27,8 +26,8 @@ import lombok.experimental.FieldDefaults;
 @Entity
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     String name;
 

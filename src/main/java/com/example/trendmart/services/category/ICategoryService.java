@@ -1,12 +1,11 @@
 package com.example.trendmart.services.category;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.example.trendmart.entities.Category;
 
 public interface ICategoryService {
-  Category getCategoryById(UUID id);
+  Category getCategoryById(Long id);
 
   Category getCategoryByName(String name);
 
@@ -14,7 +13,7 @@ public interface ICategoryService {
 
   Category addCategory(Category category);
 
-  Category updateCategory(Category category, UUID id);
+  Category updateCategory(Category category, Long id);
 
-  void deleteCategoryById(UUID id);
+  void deleteCategoryById(Long id);
 }

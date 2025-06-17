@@ -1,7 +1,6 @@
 package com.example.trendmart.services.product;
 
 import java.util.List;
-import java.util.UUID;
 
 import com.example.trendmart.entities.Product;
 import com.example.trendmart.requests.AddProductRequest;
@@ -12,11 +11,11 @@ public interface IProductService {
 
     List<Product> getAllProducts();
 
-    Product getProductById(UUID id);
+    Product getProductById(Long id);
 
-    void deleteProductById(UUID id);
+    void deleteProductById(Long id);
 
-    Product updateProductById(ProductUpdateRequest product, UUID id);
+    Product updateProductById(ProductUpdateRequest product, Long id);
 
     List<Product>getProductsByCategoryName(String category);
 

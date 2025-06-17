@@ -1,12 +1,10 @@
 package com.example.trendmart.dtos;
 
-import java.util.UUID;
-
 import lombok.Data;
 
 @Data
 public class ImageDTO {
-  private UUID imageId;
+  private Long imageId;
 
   private String imageName;
 
