@@ -3,6 +3,10 @@ package com.example.trendmart.services.product;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.trendmart.dtos.ImageDTO;
+import com.example.trendmart.dtos.ProductDTO;
+import com.example.trendmart.repositories.IImageRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.example.trendmart.entities.Category;
@@ -22,12 +26,14 @@ import lombok.RequiredArgsConstructor;
 public class ProductService implements IProductService {
     private final IProductRepository productRepository;
     private final ICategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
+    private final IImageRepository imageRepository;
 
     @Override
     public Product addProduct(AddProductRequest request) {
         // check if the category is found in the DB
         // If Yes, set it as the new product category
-        // If No, the save it as a new category
+        // If No, create a new category and save it as a new category
         // The set as the new product category.
 
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
@@ -112,5 +118,22 @@ public class ProductService implements IProductService {
     @Override
     public Long countProductsByBrandAndName(String brand, String name) {
         return productRepository.countByBrandAndName(brand, name);
+    }
+
+    @Override
+    public List<ProductDTO> getConvertedProducts(List<Product> products) {
+        return products.stream().map(this::convertToDto).toList();
+    }
+
+    @Override
+    public ProductDTO convertToDto(Product product) {
+        ProductDTO productDto = modelMapper.map(product, ProductDTO.class);
+        if (product.getImages() != null) {
+            List<ImageDTO> imageDTOs = product.getImages().stream()
+                    .map(image -> modelMapper.map(image, ImageDTO.class))
+                    .toList();
+            productDto.setImages(imageDTOs);
+        }
+        return productDto;
     }
 }

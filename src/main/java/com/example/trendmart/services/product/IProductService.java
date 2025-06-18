@@ -2,6 +2,7 @@ package com.example.trendmart.services.product;
 
 import java.util.List;
 
+import com.example.trendmart.dtos.ProductDTO;
 import com.example.trendmart.entities.Product;
 import com.example.trendmart.requests.AddProductRequest;
 import com.example.trendmart.requests.ProductUpdateRequest;
@@ -28,4 +29,8 @@ public interface IProductService {
     List<Product>getProductsByBrandAndName(String brand,String name);
 
     Long countProductsByBrandAndName(String brand,String name);
+
+    List<ProductDTO> getConvertedProducts(List<Product> products);
+
+    ProductDTO convertToDto(Product product);
 }

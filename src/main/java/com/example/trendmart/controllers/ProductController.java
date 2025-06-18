@@ -4,6 +4,8 @@ import java.util.List;
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+
+import com.example.trendmart.dtos.ProductDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +35,11 @@ public class ProductController {
   })
   @GetMapping("/all")
   public ResponseEntity<CustomApiResponse> getAll() {
-    return ResponseEntity.ok(new CustomApiResponse("Products fetched successfully", productService.getAllProducts()));
+    List<Product> products =  productService.getAllProducts();
+
+    List<ProductDTO> productDTOs = productService.getConvertedProducts(products);
+
+    return ResponseEntity.ok(new CustomApiResponse("Products fetched successfully", productDTOs));
   }
 
   @Operation(summary = "Get a product by id")
@@ -44,7 +50,11 @@ public class ProductController {
   @GetMapping("/{id}")
   public ResponseEntity<CustomApiResponse> getProductById(@PathVariable Long id) {
     try {
-      return ResponseEntity.ok(new CustomApiResponse("Product fetched successfully", productService.getProductById(id)));
+      Product product = productService.getProductById(id);
+
+      ProductDTO productDto = productService.convertToDto(product);
+
+      return ResponseEntity.ok(new CustomApiResponse("Product fetched successfully", productDto));
     } catch (Exception e) {
       return ResponseEntity.status(NOT_FOUND).body(new CustomApiResponse(e.getMessage(), null));
     }
@@ -58,7 +68,11 @@ public class ProductController {
   @PostMapping("/add")
   public ResponseEntity<CustomApiResponse> addProduct(@RequestBody AddProductRequest product) {
     try {
-      return ResponseEntity.ok(new CustomApiResponse("Product added successfully", productService.addProduct(product)));
+      Product theProduct = productService.addProduct(product);
+
+      ProductDTO productDto = productService.convertToDto(theProduct);
+
+      return ResponseEntity.ok(new CustomApiResponse("Product added successfully", productDto));
     } catch (Exception e) {
       return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new CustomApiResponse(e.getMessage(), null));
     }
@@ -70,9 +84,13 @@ public class ProductController {
       @ApiResponse(responseCode = "404", description = "Product not found")
   })
   @PutMapping("/update/{id}")
-  public ResponseEntity<CustomApiResponse> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateRequest product) {
+  public ResponseEntity<CustomApiResponse> updateProduct(@PathVariable Long id, @RequestBody ProductUpdateRequest request) {
     try {
-      return ResponseEntity.ok(new CustomApiResponse("Product updated successfully", productService.updateProductById(product, id)));
+      Product theProduct = productService.updateProductById(request, id);
+
+      ProductDTO productDto = productService.convertToDto(theProduct);
+
+      return ResponseEntity.ok(new CustomApiResponse("Product updated successfully", productDto));
     } catch (Exception e) {
       return ResponseEntity.status(NOT_FOUND).body(new CustomApiResponse(e.getMessage(), null));
     }
@@ -105,9 +123,12 @@ public class ProductController {
 
       if (products.isEmpty()) {
         return ResponseEntity.status(NOT_FOUND).body(new CustomApiResponse("Product not found", null));
-      } else {
-        return ResponseEntity.ok(new CustomApiResponse("Product fetched successfully", products));
       }
+
+      List<ProductDTO> productDTOs = productService.getConvertedProducts(products);
+
+      return ResponseEntity.ok(new CustomApiResponse("Product fetched successfully", productDTOs));
+
     } catch (Exception e) {
       return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new CustomApiResponse(e.getMessage(), null));
     }
@@ -125,9 +146,12 @@ public class ProductController {
 
       if (products.isEmpty()) {
         return ResponseEntity.status(NOT_FOUND).body(new CustomApiResponse("Product not found", null));
-      } else {
-        return ResponseEntity.ok(new CustomApiResponse("Product fetched successfully", products));
       }
+
+      List<ProductDTO> productDTOs = productService.getConvertedProducts(products);
+
+      return ResponseEntity.ok(new CustomApiResponse("Product fetched successfully", productDTOs));
+
     } catch (Exception e) {
       return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(new CustomApiResponse(e.getMessage(), null));
     }
@@ -141,7 +165,15 @@ public class ProductController {
   @GetMapping("/name/{name}")
   public ResponseEntity<CustomApiResponse> getProductByName(@PathVariable String name) {
     try {
-      return ResponseEntity.ok(new CustomApiResponse("Product fetched successfully", productService.getProductByName(name)));
+      List <Product> products = productService.getProductByName(name);
+
+      if (products.isEmpty()) {
+        return ResponseEntity.status(NOT_FOUND).body(new CustomApiResponse("Product not found", null));
+      }
+
+      List<ProductDTO> productDTOs = productService.getConvertedProducts(products);
+
+      return ResponseEntity.ok(new CustomApiResponse("Product fetched successfully", productDTOs));
     } catch (Exception e) {
       return ResponseEntity.status(NOT_FOUND).body(new CustomApiResponse(e.getMessage(), null));
     }
@@ -155,7 +187,14 @@ public class ProductController {
   @GetMapping("/brand/{brand}")
   public ResponseEntity<CustomApiResponse> getProductByBrand(@PathVariable String brand) {
     try {
-      return ResponseEntity.ok(new CustomApiResponse("Product fetched successfully", productService.getProductsByBrand(brand)));
+      List<Product> products = productService.getProductsByBrand(brand);
+      if (products.isEmpty()) {
+        return ResponseEntity.status(NOT_FOUND).body(new CustomApiResponse("No products found ", null));
+      }
+
+      List<ProductDTO> productDTOs = productService.getConvertedProducts(products);
+
+      return ResponseEntity.ok(new CustomApiResponse("Product fetched successfully", productDTOs));
     } catch (Exception e) {
       return ResponseEntity.status(NOT_FOUND).body(new CustomApiResponse(e.getMessage(), null));
     }
