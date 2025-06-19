@@ -1,4 +1,4 @@
-package com.example.trendmart.config;
+package com.example.trendmart.security.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
