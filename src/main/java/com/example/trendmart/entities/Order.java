@@ -24,7 +24,7 @@ public class Order {
     private BigDecimal totalAmount;
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<OrderItem> orderItems = new HashSet<>();
 
     @ManyToOne
