@@ -1,6 +1,7 @@
 package com.example.trendmart.services.cart;
 
 import com.example.trendmart.entities.Cart;
+import com.example.trendmart.entities.User;
 import com.example.trendmart.exceptions.ResourceNotFoundException;
 import com.example.trendmart.repositories.ICartItemRepository;
 import com.example.trendmart.repositories.ICartRepository;
@@ -43,9 +44,9 @@ public class CartService implements ICartService {
 
     @Override
     @Transactional
-    public Long initializeNewCart() {
+    public Long initializeNewCart(User user) {
         Cart newCart = new Cart();
-        // Let the database generate the ID
+        newCart.setUser(user);
         return cartRepository.save(newCart).getId();
     }
 

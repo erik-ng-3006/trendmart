@@ -28,6 +28,7 @@ public class OrderController {
     public ResponseEntity<CustomApiResponse> createOrder(@RequestParam Long userId) {
         try {
             Order order =  orderService.placeOrder(userId);
+            OrderDTO orderDTO = orderService.convertToDto(order);
             return ResponseEntity.ok(new CustomApiResponse("Item Order Success!", order));
         } catch (Exception e) {
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new CustomApiResponse("Error Occured!", e.getMessage()));

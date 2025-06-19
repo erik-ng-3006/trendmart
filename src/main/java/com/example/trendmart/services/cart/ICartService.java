@@ -1,6 +1,7 @@
 package com.example.trendmart.services.cart;
 
 import com.example.trendmart.entities.Cart;
+import com.example.trendmart.entities.User;
 
 import java.math.BigDecimal;
 
@@ -11,7 +12,7 @@ public interface ICartService {
 
     BigDecimal getTotalPrice(Long id);
 
-    Long initializeNewCart();
+    Long initializeNewCart(User user);
 
     Cart getCartByUserId(Long userId);
 }

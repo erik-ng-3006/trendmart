@@ -2,10 +2,12 @@ package com.example.trendmart.controllers;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import com.example.trendmart.entities.User;
 import com.example.trendmart.exceptions.ResourceNotFoundException;
 import com.example.trendmart.responeses.CustomApiResponse;
 import com.example.trendmart.services.cart.ICartItemService;
 import com.example.trendmart.services.cart.ICartService;
+import com.example.trendmart.services.user.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CartItemController {
     private final ICartItemService cartItemService;
     private final ICartService cartService;
+    private final IUserService userService;
 
 
     @PostMapping("/item/add")
@@ -30,8 +33,10 @@ public class CartItemController {
                                                            @RequestParam Long productId,
                                                            @RequestParam Integer quantity) {
         try {
+            User user = userService.getUserById(1L);
+
             if (cartId == null) {
-                cartId= cartService.initializeNewCart();
+                cartId= cartService.initializeNewCart(user);
             }
             cartItemService.addItemToCart(cartId, productId, quantity);
             return ResponseEntity.ok(new CustomApiResponse("Add Item Success", null));
