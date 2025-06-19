@@ -1,7 +1,5 @@
 package com.example.trendmart.services.cart;
 
-import java.math.BigDecimal;
-
 import com.example.trendmart.entities.Cart;
 import com.example.trendmart.entities.CartItem;
 import com.example.trendmart.entities.Product;
@@ -11,6 +9,7 @@ import com.example.trendmart.repositories.ICartRepository;
 import com.example.trendmart.services.product.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -22,71 +21,74 @@ public class CartItemService  implements ICartItemService{
     private final ICartService cartService;
 
     @Override
+    @Transactional
     public void addItemToCart(Long cartId, Long productId, int quantity) {
-        //1. Get the cart
-        //2. Get the product
-        //3. Check if the product is already in cart
-        //4. If Yes, then increase the quantity with the requested quantity
-        //5. If No, then initiate a new CartItem entry.
-        Cart cart = cartService.getCart(cartId);
+        // Use a synchronized block to prevent concurrent modifications
+        synchronized (this) {
+            // Get the cart with a fresh database state
+            Cart cart = cartService.getCart(cartId);
+            Product product = productService.getProductById(productId);
 
-        Product product = productService.getProductById(productId);
+            // Check if the product is already in the cart
+            CartItem cartItem = cart.getItems().stream()
+                    .filter(item -> item.getProduct().getId().equals(productId))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        CartItem newItem = new CartItem();
+                        newItem.setCart(cart);
+                        newItem.setProduct(product);
+                        newItem.setQuantity(0);
+                        newItem.setUnitPrice(product.getPrice());
+                        return newItem;
+                    });
 
-        CartItem cartItem = cart.getItems()
-                .stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
-                .findFirst().orElse(new CartItem());
-
-        if (cartItem.getId() == null) {
-            cartItem.setCart(cart);
-            cartItem.setProduct(product);
-            cartItem.setQuantity(quantity);
-            cartItem.setUnitPrice(product.getPrice());
-        }
-        else {
+            // Update quantity
             cartItem.setQuantity(cartItem.getQuantity() + quantity);
+            cartItem.setTotalPrice();
+
+            // Save the cart item
+            if (cartItem.getId() == null) {
+                cart.addItem(cartItem);
+            }
+            
+            cartItemRepository.save(cartItem);
+            cartRepository.save(cart);
         }
-
-        cartItem.setTotalPrice();
-
-        cart.addItem(cartItem);
-
-        cartItemRepository.save(cartItem);
-
-        cartRepository.save(cart);
     }
 
     @Override
-    public void removeItemFromCart(Long cartId, Long productId) {
-        Cart cart = cartService.getCart(cartId);
-
-        CartItem itemToRemove = getCartItem(cartId, productId);
-
-        cart.removeItem(itemToRemove);
-
-        cartRepository.save(cart);
+    @Transactional
+    public void removeItemFromCart(Long cartId, Long itemId) {
+        synchronized (this) {
+            Cart cart = cartService.getCart(cartId);
+            CartItem itemToRemove = getCartItem(cartId, itemId);
+            cart.removeItem(itemToRemove);
+            cartRepository.save(cart);
+        }
     }
 
     @Override
-    public void updateItemQuantity(Long cartId, Long productId, int quantity) {
+    @Transactional
+    public void updateItemQuantity(Long cartId, Long itemId, int quantity) {
+        // Get the cart
         Cart cart = cartService.getCart(cartId);
-
-        cart.getItems()
-                .stream()
-                .filter(item -> item.getProduct().getId().equals(productId))
+        
+        // Find the item in the cart
+        CartItem item = cart.getItems().stream()
+                .filter(i -> i.getId().equals(itemId))
                 .findFirst()
-                .ifPresent(item -> {
-                    item.setQuantity(quantity);
-                    item.setUnitPrice(item.getProduct().getPrice());
-                    item.setTotalPrice();
-                });
-
-        BigDecimal totalAmount = cart.getItems()
-                .stream().map(CartItem ::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        cart.setTotalAmount(totalAmount);
-
+                .orElseThrow(() -> new ResourceNotFoundException("Cart item not found with id: " + itemId));
+        
+        // Update item details
+        item.setQuantity(quantity);
+        item.setUnitPrice(item.getProduct().getPrice());
+        item.setTotalPrice();
+        
+        // Save the updated item
+        cartItemRepository.save(item);
+        
+        // Update cart total amount
+        cart.updateTotalAmount();
         cartRepository.save(cart);
     }
 
