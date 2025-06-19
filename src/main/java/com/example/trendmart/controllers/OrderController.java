@@ -5,27 +5,32 @@ import java.util.List;
 import com.example.trendmart.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.trendmart.dtos.OrderDTO;
 import com.example.trendmart.entities.Order;
 import com.example.trendmart.responeses.CustomApiResponse;
 import com.example.trendmart.services.order.IOrderService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Orders", description = "APIs for managing orders")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("${api.prefix}/orders")
 public class OrderController {
     private final IOrderService orderService;
 
+    @Operation(summary = "Create a new order from user's cart")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Order created successfully"),
+        @ApiResponse(responseCode = "404", description = "User or cart not found")
+    })
     @PostMapping("/order")
-    public ResponseEntity<CustomApiResponse> createOrder(@RequestParam Long userId) {
+    public ResponseEntity<CustomApiResponse> createOrder(@Parameter(description = "ID of the user") @RequestParam Long userId) {
         try {
             Order order =  orderService.placeOrder(userId);
             OrderDTO orderDTO = orderService.convertToDto(order);
@@ -35,8 +40,14 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/{orderId}/order")
-    public ResponseEntity<CustomApiResponse> getOrderById(@PathVariable Long orderId) {
+    @Operation(summary = "Get order by ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Order found"),
+        @ApiResponse(responseCode = "404", description = "Order not found")
+    })
+    @GetMapping("/order/{orderId}")
+    public ResponseEntity<CustomApiResponse> getOrderById(
+            @Parameter(description = "ID of the order") @PathVariable Long orderId) {
         try {
             OrderDTO order = orderService.getOrder(orderId);
             return ResponseEntity.ok(new CustomApiResponse("Item Order Success!", order));
@@ -45,8 +56,14 @@ public class OrderController {
         }
     }
 
-    @GetMapping("/{userId}/order")
-    public ResponseEntity<CustomApiResponse> getUserOrders(@PathVariable Long userId) {
+    @Operation(summary = "Get all orders for a user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Orders retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<CustomApiResponse> getUserOrders(
+            @Parameter(description = "ID of the user") @PathVariable Long userId) {
         try {
             List<OrderDTO> order = orderService.getUserOrders(userId);
             return ResponseEntity.ok(new CustomApiResponse("Item Order Success!", order));
