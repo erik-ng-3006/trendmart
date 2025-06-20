@@ -54,18 +54,20 @@ public class ShopConfig {
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
-        var AuthenticationProvider = new DaoAuthenticationProvider();
-        AuthenticationProvider.setUserDetailsService(shopUserDetailsService);
-        AuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        return AuthenticationProvider;
+        var authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService(shopUserDetailsService);
+        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        return authenticationProvider;
     }
 
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(SECURED_URLS.toArray(String[]::new)).permitAll()
+                        .requestMatchers(SECURED_URLS.toArray(String[]::new)).authenticated()
+                        .anyRequest().permitAll()
                 );
         http.authenticationProvider(daoAuthenticationProvider());
         http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -1,5 +1,6 @@
 package com.example.trendmart.controllers;
 
+import static org.ietf.jgss.GSSException.UNAUTHORIZED;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.example.trendmart.entities.User;
@@ -8,6 +9,7 @@ import com.example.trendmart.responeses.CustomApiResponse;
 import com.example.trendmart.services.cart.ICartItemService;
 import com.example.trendmart.services.cart.ICartService;
 import com.example.trendmart.services.user.IUserService;
+import io.jsonwebtoken.JwtException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,7 +45,7 @@ public class CartItemController {
             @Parameter(description = "ID of the product to add") @RequestParam Long productId,
             @Parameter(description = "Quantity of the product") @RequestParam Integer quantity) {
         try {
-            User user = userService.getUserById(1L);
+            User user = userService.getAuthenticatedUser();
 
             if (cartId == null) {
                 cartId = cartService.initializeNewCart(user);
@@ -52,6 +54,8 @@ public class CartItemController {
             return ResponseEntity.ok(new CustomApiResponse("Add Item Success", null));
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new CustomApiResponse(e.getMessage(), null));
+        } catch (JwtException e) {
+            return ResponseEntity.status(UNAUTHORIZED).body(new CustomApiResponse(e.getMessage(), null));
         }
     }
 
