@@ -1,10 +1,12 @@
 package com.example.trendmart.controllers;
 
+import com.example.trendmart.requests.CreateUserRequest;
 import com.example.trendmart.requests.LoginRequest;
 import com.example.trendmart.responeses.CustomApiResponse;
 import com.example.trendmart.responeses.JwtResponse;
 import com.example.trendmart.security.jwt.JwtUtils;
 import com.example.trendmart.security.user.ShopUserDetails;
+import com.example.trendmart.services.user.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
+    private final IUserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<CustomApiResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -46,5 +49,17 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new CustomApiResponse(e.getMessage(), null));
         }
 
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<CustomApiResponse> registerUser(@Valid @RequestBody CreateUserRequest registerRequest) {
+        try {
+            var user = userService.createUser(registerRequest);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new CustomApiResponse("User registered successfully", user));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new CustomApiResponse(e.getMessage(), null));
+        }
     }
 }
