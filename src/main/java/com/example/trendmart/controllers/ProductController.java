@@ -99,6 +99,7 @@ public class ProductController {
     }
   }
 
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @Operation(summary = "Delete a product by id")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Product deleted successfully"),
