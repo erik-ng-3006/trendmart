@@ -7,6 +7,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.example.trendmart.dtos.ProductDTO;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.trendmart.entities.Product;
@@ -60,6 +61,7 @@ public class ProductController {
     }
   }
 
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @Operation(summary = "Add a product")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Product added successfully"),
@@ -78,6 +80,7 @@ public class ProductController {
     }
   }
 
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @Operation(summary = "Update a product by id")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Product updated successfully"),
