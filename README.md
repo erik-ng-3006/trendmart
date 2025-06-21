@@ -108,30 +108,119 @@ TrendMart is a full-featured e-commerce platform built with Spring Boot, offerin
 
 ## 🗄 Database Schema
 
-The application uses the following main entities:
+Here's the database schema for the TrendMart application:
 
-- **User** - Stores user information
-- **Product** - Product catalog
-- **Category** - Product categories
-- **Cart** - Shopping cart
-- **CartItem** - Items in the cart
-- **Order** - Order information
-- **OrderItem** - Items in an order
+![Database Schema](src/main/resources/images/database_schema.png)
 
-## 🔒 Environment Variables
+### Entity Relationships
 
-Create a `.env` file in the root directory with the following variables:
+- **User** - Stores user information and authentication details
+- **Product** - Product catalog with details like name, price, and inventory
+- **Category** - Product categories and subcategories
+- **Cart** - Shopping cart associated with each user
+- **CartItem** - Individual items in a shopping cart
+- **Order** - Order information including status and timestamps
+- **OrderItem** - Items included in each order
+- **Role** - User roles and permissions
+- **User_Roles** - Join table for user-role many-to-many relationship
 
-```
-# Database
+## 🔒 Environment Configuration
+
+### 1. Environment Variables Setup
+
+Create a `.env` file in the root directory of the project with the following configuration:
+
+```env
+# ===== Database Configuration =====
+# Database connection URL
+# Format: jdbc:mysql://[host]:[port]/[database]?[parameters]
 DB_URL=jdbc:mysql://localhost:3306/trendmart?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
-DB_USERNAME=your_username
-DB_PASSWORD=your_password
 
-# JWT
-JWT_SECRET=your_jwt_secret
+# Database credentials
+DB_USERNAME=your_mysql_username
+DB_PASSWORD=your_mysql_password
+
+# ===== JWT Configuration =====
+# Secret key for JWT token signing (use a strong, unique key in production)
+# Generate a secure key: `openssl rand -base64 32`
+JWT_SECRET=your_secure_jwt_secret_key_here
+
+# JWT token expiration time in milliseconds (default: 24 hours)
 JWT_EXPIRATION_MS=86400000
+
+# ===== Application Settings =====
+# Server port (default: 8080)
+SERVER_PORT=8080
+
+# Logging level (DEBUG, INFO, WARN, ERROR)
+LOGGING_LEVEL=INFO
+
+# CORS allowed origins (comma-separated)
+# Example: http://localhost:3000,http://localhost:4200
+CORS_ALLOWED_ORIGINS=*
 ```
+
+### 2. Required Software
+
+Before running the application, ensure you have the following installed:
+
+- **MySQL 8.0+**
+  - Download: [MySQL Community Server](https://dev.mysql.com/downloads/mysql/)
+  - Create a new database named `trendmart`
+  - Note down your MySQL credentials
+
+- **Java 17 JDK**
+  - Download: [OpenJDK 17](https://adoptium.net/)
+  - Verify installation: `java -version`
+
+- **Maven 3.6.3+**
+  - Download: [Maven](https://maven.apache.org/download.cgi)
+  - Verify installation: `mvn -v`
+
+### 3. Configuration Steps
+
+1. **Database Setup**
+   - Install MySQL if not already installed
+   - Create a new database:
+     ```sql
+     CREATE DATABASE trendmart CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+     ```
+   - Create a MySQL user with appropriate privileges
+
+2. **Environment File**
+   - Copy the example configuration above to a new file named `.env` in the project root
+   - Update the following values:
+     - `DB_USERNAME`: Your MySQL username
+     - `DB_PASSWORD`: Your MySQL password
+     - `JWT_SECRET`: Generate a secure random string
+     - Adjust other values as needed for your environment
+
+3. **Build and Run**
+   ```bash
+   # Install dependencies
+   mvn clean install
+   
+   # Run the application
+   mvn spring-boot:run
+   ```
+
+### 4. Testing the Configuration
+
+After starting the application, you can test the setup:
+
+1. Access Swagger UI: http://localhost:8080/swagger-ui.html
+2. Try registering a new user via `/api/v1/auth/register`
+3. Test authentication with `/api/v1/auth/login`
+
+### 5. Production Considerations
+
+For production deployment:
+1. Change `JWT_SECRET` to a strong, randomly generated value
+2. Set `createDatabaseIfNotExist=false` in the DB_URL
+3. Configure proper SSL/TLS for database connections
+4. Set appropriate logging levels
+5. Configure proper CORS settings
+6. Use environment-specific profiles (e.g., `application-prod.yml`)
 
 ## 🧪 Running Tests
 
