@@ -2,6 +2,7 @@ package com.example.trendmart.security.config;
 
 import com.example.trendmart.security.jwt.AuthTokenFilter;
 import com.example.trendmart.security.jwt.JwtAuthEntryPoint;
+import com.example.trendmart.security.jwt.JwtUtils;
 import com.example.trendmart.security.user.ShopUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,13 +23,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.List;
 
-
+@EnableMethodSecurity(prePostEnabled = true)
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class ShopConfig {
     private final ShopUserDetailsService shopUserDetailsService;
     private final JwtAuthEntryPoint jwtAuthEntryPoint;
+    private final JwtUtils jwtUtils;
 
     private static final List<String> SECURED_URLS = List.of(
             "/api/v1/carts/**", "/api/v1/cartItems/**");
@@ -43,8 +46,8 @@ public class ShopConfig {
     }
 
     @Bean
-    public AuthTokenFilter authTokenFilter() {
-        return new AuthTokenFilter();
+    public AuthTokenFilter authTokenFilter(JwtUtils jwtUtils, ShopUserDetailsService userDetailsService) {
+        return new AuthTokenFilter(jwtUtils, userDetailsService);
     }
 
     @Bean
@@ -70,7 +73,7 @@ public class ShopConfig {
                         .anyRequest().permitAll()
                 );
         http.authenticationProvider(daoAuthenticationProvider());
-        http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authTokenFilter(jwtUtils, shopUserDetailsService), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
